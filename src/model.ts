@@ -6,3 +6,11 @@ export type Card = {
     interval: number,
     lastSeen: number
 };
+
+export type Deck = {
+    id: string,
+    name: string,
+    unseenCards: Card[],
+    seenCards: Card[],
+    lastStudied: number
+};

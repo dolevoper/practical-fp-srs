@@ -1,171 +1,21 @@
 import "./study.scss";
 
-import { Card } from "./cards";
+import { Deck } from "./model";
 
-const unseenCards: Card[] = [
-  {
-    front: "Hello",
-    back: "Olá",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Goodbye",
-    back: "Chau",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Thank you",
-    back: "Obrigado\nObrigada",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Please",
-    back: "Por favor",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Sorry",
-    back: "Desculpe",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Excuse me",
-    back: "Com licença",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "How are you?",
-    back: "Tudo bem?",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I'm fine, thanks",
-    back: "Tudo otimo, obrigado",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "What's your name?",
-    back: "Como se chama?",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "My name is Dan",
-    back: "Sou Dan",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Where are you from?",
-    back: "De onde é?",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I'm from Tel-Aviv",
-    back: "Sou de Tel-Aviv",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "How old are you?",
-    back: "Quantos anos tem?",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I'm twenty one years old",
-    back: "Tenho vinte e um anos",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "Do you speak English?",
-    back: "Se fala inglês?",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I don't understand",
-    back: "Não entendo",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I don't know",
-    back: "Não sei",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I don't remember",
-    back: "Não me lembro",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I don't want",
-    back: "Não quero",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
-  },
-  {
-    front: "I don't have",
-    back: "Não tenho",
-    successCount: 0,
-    easinessFactor: 2.5,
-    interval: 1,
-    lastSeen: 0
+const decks = JSON.parse(localStorage.getItem("decks") ?? "[]") as Deck[];
+const deck = loadDeck();
+
+function loadDeck() {
+  const deckId = window.location.hash.slice(1);
+  const deck = decks.find((d) => d.id === deckId);
+
+  if (!deck) {
+    window.location.replace("/");
+    throw new Error();
   }
-];
 
-const seenCards: Card[] = [];
+  return deck;
+}
 
 function renderCard() {
   const cardElement = document.querySelector("#card") as HTMLDivElement | null;
@@ -177,8 +27,8 @@ function renderCard() {
   document.body.classList.remove("answer-seen");
   cardElement.style.setProperty("visibility", "hidden");
   cardElement.classList.remove("card--flipped");
-  cardElement.querySelector(".card__front")!.textContent = seenCards[0].front;
-  cardElement.querySelector(".card__back")!.textContent = seenCards[0].back;
+  cardElement.querySelector(".card__front")!.textContent = deck.seenCards[0].front;
+  cardElement.querySelector(".card__back")!.textContent = deck.seenCards[0].back;
 
   setTimeout(() => {
     cardElement.style.setProperty("visibility", "visible");
@@ -191,9 +41,31 @@ document.querySelector("#btnFlip")?.addEventListener("click", () => {
 });
 
 function startSession() {
-  seenCards.push(...unseenCards.splice(0, 5));
+  const lastStudiedDate = new Date(deck.lastStudied);
+  const now = new Date();
 
-  renderCard();
+  lastStudiedDate.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+
+  if (lastStudiedDate < now) {
+    deck.seenCards.push(...deck.unseenCards.splice(0, 5));
+  }
+
+  studyCard();
+}
+
+function studyCard() {
+  deck.seenCards.sort((a, b) => a.interval === b.interval ? a.lastSeen - b.lastSeen : a.interval - b.interval);
+
+  const nextCard = deck.seenCards[0];
+  const timeFromLastSeenInDays = Math.ceil((Date.now() - nextCard.lastSeen) / 1000 / 60 / 60 / 24);
+
+  if (timeFromLastSeenInDays >= nextCard.interval) {
+    renderCard();
+  } else {
+    alert("Done!");
+    window.location.replace("/");
+  }
 }
 
 document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
@@ -205,7 +77,7 @@ document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
     throw new Error();
   }
 
-  const card = seenCards[0];
+  const card = deck.seenCards[0];
 
   if (grade >= 3) {
     if (card.successCount === 0) {
@@ -230,17 +102,13 @@ document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
 
   card.lastSeen = Date.now();
 
-  seenCards.sort((a, b) => a.interval === b.interval ? a.lastSeen - b.lastSeen : a.interval - b.interval);
+  studyCard();
+});
 
-  const nextCard = seenCards[0];
-  const timeFromLastSeenInDays = Math.ceil((Date.now() - nextCard.lastSeen) / 1000 / 60 / 60 / 24);
+window.addEventListener("unload", () => {
+  deck.lastStudied = Date.now();
 
-  if (timeFromLastSeenInDays >= nextCard.interval) {
-    renderCard();
-  } else {
-    alert("Done!");
-  }
-
+  localStorage.setItem("decks", JSON.stringify(decks));
 });
 
 startSession();
