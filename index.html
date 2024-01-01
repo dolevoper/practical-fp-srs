@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical FP - Total Recall</title>
+  <link rel="stylesheet" href="/reset.scss" />
+  <link rel="stylesheet" href="/composition.scss" />
+  <link rel="stylesheet" href="/utility.scss" />
+  <link rel="stylesheet" href="/block.scss" />
+</head>
+
+<body>
+  <header>
+    <h1>Decks</h1>
+  </header>
+  <main class="flow">
+    <details class="reading">
+      <summary>
+        <h2>Import deck</h2>
+      </summary>
+      <form name="importDeck" class="flow">
+        <div class="form-control">
+          <label for="deck">Deck file</label>
+          <input id="deck" type="file" name="deck" accept=".csv" />
+        </div>
+        <div>
+          <p>Deck name: <output name="deckName"></output></p>
+          <p>Number of cards: <output name="cardCount"></output></p>
+        </div>
+        <button class="button">Import</button>
+      </form>
+    </details>
+
+    <article class="flow reading">
+      <h2>Decks</h2>
+      <ul>
+        <li><a href="/study/">English - Portuguese</a></li>
+      </ul>
+    </article>
+  </main>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

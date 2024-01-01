@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practical FP - Total Recall</title>
+  <link rel="stylesheet" href="/reset.scss" />
+  <link rel="stylesheet" href="/composition.scss" />
+  <link rel="stylesheet" href="/utility.scss" />
+</head>
+
+<body>
+  <header>
+    <h1>Study</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Decks</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <article class="study reading">
+      <article id="card" class="card">
+        <p class="card__front"></p>
+        <p class="card__back"></p>
+      </article>
+
+      <button id="btnFlip" class="study__flip">Flip</button>
+
+      <form name="feedback" class="study__feedback">
+        <button value="0" class="study__feedback__button study__feedback__button--fail">Blackout</button>
+        <button value="1" class="study__feedback__button study__feedback__button--fail">Familier</button>
+        <button value="2" class="study__feedback__button study__feedback__button--fail">Easy to remember</button>
+        <button value="3" class="study__feedback__button study__feedback__button--pass">Hard</button>
+        <button value="4" class="study__feedback__button study__feedback__button--pass">Easy</button>
+        <button value="5" class="study__feedback__button study__feedback__button--pass">Perfect recall</button>
+      </form>
+    </article>
+  </main>
+
+  <script type="module" src="/src/study.ts"></script>
+</body>
+
+</html>

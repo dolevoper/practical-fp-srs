@@ -1,0 +1,89 @@
+.study {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+
+  &__flip {
+    background: hsl(148deg 100% 54%);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: white;
+    border-radius: 4px;
+  }
+
+  &__feedback {
+    visibility: hidden;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
+    gap: 0.5rem;
+
+    &__button {
+      font-weight: 600;
+      color: white;
+      border-radius: 4px;
+
+      &--fail {
+        background: red;
+      }
+
+      &--pass {
+        background: green;
+      }
+    }
+
+    .answer-seen & {
+      visibility: visible;
+    }
+  }
+}
+
+.card {
+  color: white;
+  perspective: 1000px;
+  flex: 1;
+  aspect-ratio: 3/4;
+  align-self: center;
+  max-width: 100%;
+  contain: content;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+
+  &__front,
+  &__back {
+    display: grid;
+    place-items: center;
+
+    background: deeppink;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 5rem;
+    font-size: calc(1rem + 5cqw);
+    white-space: pre-wrap;
+    font-weight: 600;
+    grid-column: 1;
+    grid-row: 1;
+    backface-visibility: hidden;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  &__back {
+    transform: rotateY(180deg);
+  }
+
+  &--flipped {
+    & .card__front {
+      transform: rotateY(180deg);
+    }
+
+    & .card__back {
+      transform: rotateY(0deg);
+    }
+  }
+}
