@@ -1,6 +1,6 @@
 import "./study.scss";
 
-import { Deck } from "./model";
+import { Deck, parseGrade } from "./model";
 
 const decks = JSON.parse(localStorage.getItem("decks") ?? "[]") as Deck[];
 const deck = loadDeck();
@@ -71,7 +71,7 @@ function studyCard() {
 document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const grade = Number(event.submitter?.getAttribute("value"));
+  const grade = parseGrade(event.submitter?.getAttribute("value"));
 
   if (Number.isNaN(grade)) {
     throw new Error();
