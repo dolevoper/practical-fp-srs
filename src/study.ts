@@ -1,9 +1,11 @@
 import "./study.scss";
 
-import { Deck, parseGrade } from "./model";
+import { Card, Deck, drawCard, gradeCard, parseGrade, pushCards, revealCards } from "./model";
 
 const decks = JSON.parse(localStorage.getItem("decks") ?? "[]") as Deck[];
-const deck = loadDeck();
+
+let deck = loadDeck();
+let currentCard: Card | null = null;
 
 function loadDeck() {
   const deckId = window.location.hash.slice(1);
@@ -18,6 +20,12 @@ function loadDeck() {
 }
 
 function renderCard() {
+  if (!currentCard) {
+    alert("Done!");
+    window.location.replace("/");
+    return;
+  }
+
   const cardElement = document.querySelector("#card") as HTMLDivElement | null;
 
   if (!cardElement) {
@@ -27,8 +35,8 @@ function renderCard() {
   document.body.classList.remove("answer-seen");
   cardElement.style.setProperty("visibility", "hidden");
   cardElement.classList.remove("card--flipped");
-  cardElement.querySelector(".card__front")!.textContent = deck.seenCards[0].front;
-  cardElement.querySelector(".card__back")!.textContent = deck.seenCards[0].back;
+  cardElement.querySelector(".card__front")!.textContent = currentCard.front;
+  cardElement.querySelector(".card__back")!.textContent = currentCard.back;
 
   setTimeout(() => {
     cardElement.style.setProperty("visibility", "visible");
@@ -48,24 +56,16 @@ function startSession() {
   now.setHours(0, 0, 0, 0);
 
   if (lastStudiedDate < now) {
-    deck.seenCards.push(...deck.unseenCards.splice(0, 5));
+    deck = revealCards(deck);
   }
 
   studyCard();
 }
 
 function studyCard() {
-  deck.seenCards.sort((a, b) => a.interval === b.interval ? a.lastSeen - b.lastSeen : a.interval - b.interval);
+  [currentCard, deck] = drawCard(deck, Date.now());
 
-  const nextCard = deck.seenCards[0];
-  const timeFromLastSeenInDays = Math.ceil((Date.now() - nextCard.lastSeen) / 1000 / 60 / 60 / 24);
-
-  if (timeFromLastSeenInDays >= nextCard.interval) {
-    renderCard();
-  } else {
-    alert("Done!");
-    window.location.replace("/");
-  }
+  renderCard();
 }
 
 document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
@@ -73,34 +73,12 @@ document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
 
   const grade = parseGrade(event.submitter?.getAttribute("value"));
 
-  if (Number.isNaN(grade)) {
+  if (Number.isNaN(grade) || !currentCard) {
     throw new Error();
   }
 
-  const card = deck.seenCards[0];
-
-  if (grade >= 3) {
-    if (card.successCount === 0) {
-      card.interval = 1;
-    } else if (card.successCount === 1) {
-      card.interval = 6;
-    } else {
-      card.interval = Math.round(card.interval * card.easinessFactor);
-    }
-
-    ++card.successCount;
-  } else {
-    card.successCount = 0;
-    card.interval = 1;
-  }
-
-  card.easinessFactor += 0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02);
-
-  if (card.easinessFactor < 1.3) {
-    card.easinessFactor = 1.3;
-  }
-
-  card.lastSeen = Date.now();
+  currentCard = gradeCard(currentCard, grade, Date.now());
+  deck = pushCards(deck, currentCard);
 
   studyCard();
 });
@@ -108,7 +86,12 @@ document.forms.namedItem("feedback")?.addEventListener("submit", (event) => {
 window.addEventListener("unload", () => {
   deck.lastStudied = Date.now();
 
-  localStorage.setItem("decks", JSON.stringify(decks));
+  localStorage.setItem(
+    "decks",
+    JSON.stringify(decks.map(
+      (d) => d.id !== deck.id ? d : deck
+    ))
+  );
 });
 
 startSession();
