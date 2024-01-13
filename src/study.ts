@@ -1,6 +1,6 @@
 import "./study.scss";
 
-import { Card, Deck, drawCard, gradeCard, parseGrade, pushCards, revealCards } from "./model";
+import { Card, Deck, drawCard, gradeCard, grades, parseGrade, pushCards, revealCards, updateInterval } from "./model";
 
 const decks = JSON.parse(localStorage.getItem("decks") ?? "[]") as Deck[];
 
@@ -37,6 +37,10 @@ function renderCard() {
   cardElement.classList.remove("card--flipped");
   cardElement.querySelector(".card__front")!.textContent = currentCard.front;
   cardElement.querySelector(".card__back")!.textContent = currentCard.back;
+
+  for (const grade of grades) {
+    document.querySelector(`button[value="${grade}"]`)?.setAttribute("title", `+${updateInterval(currentCard, grade)} days`);
+  }
 
   setTimeout(() => {
     cardElement.style.setProperty("visibility", "visible");

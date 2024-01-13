@@ -15,7 +15,9 @@ export type Deck = {
     lastStudied: number
 };
 
-export type Grade = 0 | 1 | 2 | 3 | 4 | 5;
+export const grades = [0, 1, 2, 3, 4, 5] as const;
+
+export type Grade = typeof grades[number];
 
 export function parseGrade(grade: unknown): Grade {
     const numericGrade = Number(grade);
@@ -45,7 +47,7 @@ function updateSuccessCount(card: Card, grade: Grade) {
     return isFailure(grade) ? 0 : card.successCount + 1;
 }
 
-function updateInterval(card: Card, grade: Grade) {
+export function updateInterval(card: Card, grade: Grade) {
     if (isFailure(grade)) {
         return 1;
     } else if (card.successCount === 0) {
